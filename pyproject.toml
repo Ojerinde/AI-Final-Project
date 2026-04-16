@@ -1,0 +1,13 @@
+[project]
+name = "cislunar-trajectory-gen"
+version = "0.1.0"
+description = "AI-Based Fast Cislunar Trajectory Generation"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

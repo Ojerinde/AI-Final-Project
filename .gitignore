@@ -1,1 +1,28 @@
-/data
+# ── Python ──────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# ── Environment ────────────────────
+.env
+.venv/
+venv/
+
+# ── IDE ────────────────────────────
+.vscode/
+.idea/
+
+# ── OS ─────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Project-specific ───────────────
+knowledge_base/vectorstore/
+models_checkpoints/
+data/processed/
+data/raw/*
+
+# ── Jupyter ────────────────────────
+.ipynb_checkpoints/

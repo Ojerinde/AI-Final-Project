@@ -24,9 +24,17 @@ PROVIDERS: dict[str, dict[str, Any]] = {
         "models": [
             "llama-3.3-70b-versatile",
             "llama-3.1-8b-instant",
-            "mixtral-8x7b-32768",
             "gemma2-9b-it",
+            "compound-beta",
+            "mixtral-8x7b-32768",
         ],
+        "model_descriptions": {
+            "llama-3.3-70b-versatile": "⭐⭐⭐⭐⭐ Llama 3.3 70B — Best quality on Groq",
+            "llama-3.1-8b-instant":    "⭐⭐⭐⭐ Llama 3.1 8B — Fastest, very good quality",
+            "gemma2-9b-it":            "⭐⭐⭐ Gemma 2 9B — Lightweight and reliable",
+            "compound-beta":           "⭐⭐⭐⭐ Compound Beta — Multi-step reasoning",
+            "mixtral-8x7b-32768":      "⭐⭐⭐⭐ Mixtral 8×7B — Strong MoE, 32k context",
+        },
     },
     "gemini": {
         "name": "Google Gemini",
@@ -34,27 +42,53 @@ PROVIDERS: dict[str, dict[str, Any]] = {
         "free_tier": True,
         "models": [
             "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-2.5-pro-preview-03-25",
             "gemini-1.5-flash",
             "gemini-1.5-pro",
         ],
+        "model_descriptions": {
+            "gemini-2.0-flash":              "⭐⭐⭐⭐ Fast, generous free tier",
+            "gemini-2.0-flash-lite":         "⭐⭐⭐ Lightest, highest throughput",
+            "gemini-2.5-pro-preview-03-25":  "⭐⭐⭐⭐⭐ Most capable, lower free limits",
+            "gemini-1.5-flash":              "⭐⭐⭐ Previous gen, still solid",
+            "gemini-1.5-pro":                "⭐⭐⭐⭐ Previous gen pro, 1M context",
+        },
     },
     "openai": {
         "name": "OpenAI",
         "env_key": "OPENAI_API_KEY",
         "free_tier": False,
         "models": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
+        "model_descriptions": {
+            "gpt-4o":       "⭐⭐⭐⭐⭐ Flagship multimodal model",
+            "gpt-4o-mini":  "⭐⭐⭐⭐ Fast & cheap, great quality",
+            "gpt-4-turbo":  "⭐⭐⭐⭐ 128k context, strong reasoning",
+        },
     },
     "anthropic": {
         "name": "Anthropic",
         "env_key": "ANTHROPIC_API_KEY",
         "free_tier": False,
         "models": ["claude-sonnet-4-20250514", "claude-3-5-haiku-20241022"],
+        "model_descriptions": {
+            "claude-sonnet-4-20250514":    "⭐⭐⭐⭐⭐ Best reasoning, long context",
+            "claude-3-5-haiku-20241022":   "⭐⭐⭐⭐ Fast & affordable",
+        },
     },
     "ollama": {
         "name": "Ollama (local)",
         "env_key": "OLLAMA_BASE_URL",
         "free_tier": True,
-        "models": ["llama3.1", "mistral", "phi3"],
+        "models": ["llama3", "llama3.1", "mistral", "qwen2.5", "phi3", "gemma2"],
+        "model_descriptions": {
+            "llama3":   "⭐⭐⭐⭐ Meta Llama 3 8B — Best overall (~8 GB RAM)",
+            "llama3.1": "⭐⭐⭐⭐ Meta Llama 3.1 8B — Latest, very capable",
+            "mistral":  "⭐⭐⭐⭐ Mistral 7B — Fast, strong reasoning (~5 GB)",
+            "qwen2.5":  "⭐⭐⭐⭐ Qwen 2.5 7B — Excellent for technical text",
+            "phi3":     "⭐⭐⭐ Microsoft Phi-3 — Lightweight (~3 GB)",
+            "gemma2":   "⭐⭐⭐ Google Gemma 2 — Compact and reliable",
+        },
     },
 }
 

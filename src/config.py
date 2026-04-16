@@ -81,11 +81,38 @@ DEFAULT_LLM_PROVIDER = os.getenv("DEFAULT_LLM_PROVIDER", "groq")
 DEFAULT_LLM_MODEL = os.getenv("DEFAULT_LLM_MODEL", "llama-3.3-70b-versatile")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
+# ── Embedding model catalogue (100 % free, local sentence-transformers) ────
+AVAILABLE_EMBEDDING_MODELS: list[str] = [
+    "all-MiniLM-L6-v2",
+    "all-mpnet-base-v2",
+    "all-roberta-large-v1",
+]
+
+EMBEDDING_DIMENSIONS: dict[str, int] = {
+    "all-MiniLM-L6-v2":     384,
+    "all-mpnet-base-v2":    768,
+    "all-roberta-large-v1": 1024,
+}
+
+EMBEDDING_MODEL_DESCRIPTIONS: dict[str, str] = {
+    "all-MiniLM-L6-v2":     "⚡ Fastest (22 MB) — Good baseline, quick queries",
+    "all-mpnet-base-v2":    "⚖️ Balanced (438 MB) — Better accuracy, moderate speed",
+    "all-roberta-large-v1": "🎯 Highest Quality (696 MB) — Best semantic precision",
+}
+
 # ── RAG parameters ──────────────────────────────────────────────────────────
 RAG_CHUNK_SIZE = 500       # tokens per chunk
 RAG_CHUNK_OVERLAP = 50     # 10 % overlap
 RAG_TOP_K = 10             # initial retrieval count
 RAG_RERANK_K = 5           # after cross-encoder reranking
+
+# ── Reranker models ─────────────────────────────────────────────────────────
+AVAILABLE_RERANKER_MODELS: list[str] = [
+    "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "cross-encoder/ms-marco-MiniLM-L-12-v2",
+]
+
+DEFAULT_RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
 # ── Safety thresholds ──────────────────────────────────────────────────────
 MAX_CASUALTY_RISK = 1e-4   # 1:10 000 — NASA-STD-8719.14A

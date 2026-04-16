@@ -14,24 +14,32 @@ from chromadb.config import Settings
 from src.config import PATHS, EMBEDDING_MODEL, RAG_TOP_K
 
 
-def _get_embedding_function():
+def _get_embedding_function(model_name: str | None = None):
     """Get the sentence-transformers embedding function for ChromaDB.
+
+    Args:
+        model_name: Embedding model name. Defaults to config EMBEDDING_MODEL.
 
     Returns:
         ChromaDB-compatible embedding function.
     """
     from chromadb.utils import embedding_functions
     return embedding_functions.SentenceTransformerEmbeddingFunction(
-        model_name=EMBEDDING_MODEL
+        model_name=model_name or EMBEDDING_MODEL
     )
 
 
-def build_vectorstore(chunks: list[dict], collection_name: str = "cislunar_kb") -> None:
+def build_vectorstore(
+    chunks: list[dict],
+    collection_name: str = "cislunar_kb",
+    embedding_model: str | None = None,
+) -> None:
     """Build (or rebuild) the ChromaDB vector store from document chunks.
 
     Args:
         chunks: List of dicts with 'text', 'source', 'chunk_id'.
         collection_name: Name of the ChromaDB collection.
+        embedding_model: Embedding model override. Defaults to config EMBEDDING_MODEL.
     """
     persist_dir = str(PATHS["vectorstore"])
     Path(persist_dir).mkdir(parents=True, exist_ok=True)
@@ -49,7 +57,7 @@ def build_vectorstore(chunks: list[dict], collection_name: str = "cislunar_kb") 
 
     collection = client.create_collection(
         name=collection_name,
-        embedding_function=_get_embedding_function(),
+        embedding_function=_get_embedding_function(embedding_model),
         metadata={"hnsw:space": "cosine"},
     )
 
@@ -69,6 +77,7 @@ def query_vectorstore(
     collection_name: str = "cislunar_kb",
     top_k: int = RAG_TOP_K,
     source_filter: str | None = None,
+    embedding_model: str | None = None,
 ) -> list[dict]:
     """Query the vector store for relevant chunks.
 
@@ -77,6 +86,7 @@ def query_vectorstore(
         collection_name: ChromaDB collection name.
         top_k: Number of results to retrieve.
         source_filter: Optional: filter by source filename.
+        embedding_model: Embedding model override. Defaults to config EMBEDDING_MODEL.
 
     Returns:
         List of dicts with 'text', 'source', 'distance', 'chunk_id'.
@@ -88,7 +98,7 @@ def query_vectorstore(
     )
     collection = client.get_collection(
         name=collection_name,
-        embedding_function=_get_embedding_function(),
+        embedding_function=_get_embedding_function(embedding_model),
     )
 
     where_filter = {"source": source_filter} if source_filter else None

@@ -7,6 +7,10 @@ NASA-grade dark-themed interface with:
 - Agent interaction panel
 """
 
+from src.config import (
+    AVAILABLE_EMBEDDING_MODELS, EMBEDDING_MODEL_DESCRIPTIONS,
+    EMBEDDING_MODEL, AVAILABLE_RERANKER_MODELS, DEFAULT_RERANKER_MODEL,
+)
 from src.llm.provider import PROVIDERS
 import streamlit as st
 import sys
@@ -45,12 +49,35 @@ st.markdown("""
 st.sidebar.title("⚙️ Configuration")
 
 
+st.sidebar.subheader("🤖 LLM Provider")
 provider = st.sidebar.selectbox(
-    "LLM Provider",
+    "Provider",
     options=list(PROVIDERS.keys()),
-    format_func=lambda x: f"{PROVIDERS[x]['name']} {'(Free)' if PROVIDERS[x]['free_tier'] else '(Paid)'}",
+    format_func=lambda x: f"{PROVIDERS[x]['name']} {'✅ Free' if PROVIDERS[x]['free_tier'] else '💳 Paid'}",
 )
-model = st.sidebar.selectbox("Model", options=PROVIDERS[provider]["models"])
+
+model_descs = PROVIDERS[provider].get("model_descriptions", {})
+model = st.sidebar.selectbox(
+    "Model",
+    options=PROVIDERS[provider]["models"],
+    format_func=lambda m: f"{m}  —  {model_descs.get(m, '')}" if model_descs.get(
+        m) else m,
+)
+
+st.sidebar.subheader("🧬 Embedding Model")
+embedding_model = st.sidebar.selectbox(
+    "Embedding",
+    options=AVAILABLE_EMBEDDING_MODELS,
+    index=AVAILABLE_EMBEDDING_MODELS.index(EMBEDDING_MODEL),
+    format_func=lambda m: f"{m}  {EMBEDDING_MODEL_DESCRIPTIONS.get(m, '')}",
+)
+
+st.sidebar.subheader("🔀 Reranker")
+reranker_model = st.sidebar.selectbox(
+    "Cross-encoder",
+    options=AVAILABLE_RERANKER_MODELS,
+    index=AVAILABLE_RERANKER_MODELS.index(DEFAULT_RERANKER_MODEL),
+)
 
 api_key = ""
 if not PROVIDERS[provider]["free_tier"]:

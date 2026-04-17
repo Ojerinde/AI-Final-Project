@@ -1,11 +1,11 @@
 """Run the 5-dimension data quality audit."""
 
-from src.data.quality_audit import run_full_audit
-from src.data import load_raw_data, parse_vector_columns
-import sys
-from pathlib import Path
+import sys  # noqa: E402
+from pathlib import Path  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from src.data import load_raw_data, parse_vector_columns  # noqa: E402
+from src.data.quality_audit import run_full_audit  # noqa: E402
 
 
 def main():

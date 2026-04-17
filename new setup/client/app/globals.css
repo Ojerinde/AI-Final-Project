@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+/* ─── Cislunar Mission Control — Design System ─────────────────────────────── */
+
+@theme inline {
+  /* Beihang University Palette */
+  --color-beihang-red: #c8102e;
+  --color-beihang-gold: #e8b84b;
+  --color-beihang-dark: #0a0a14;
+
+  /* Space Palette */
+  --color-space-void: #020409;
+  --color-space-deep: #050b18;
+  --color-space-mid: #0d1b2a;
+  --color-space-nebula: #1b2838;
+  --color-space-panel: #0f1923;
+
+  /* Accent — orbital cyan / thrust orange */
+  --color-orbit-cyan: #00d4ff;
+  --color-orbit-teal: #00a8cc;
+  --color-thrust-orange: #ff6b35;
+  --color-thrust-amber: #ffb347;
+  --color-lunar-silver: #c0c8d8;
+  --color-star-white: #e8edf5;
+
+  /* Glow radii */
+  --glow-cyan:
+    0 0 20px rgba(0, 212, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.15);
+  --glow-orange:
+    0 0 20px rgba(255, 107, 53, 0.4), 0 0 60px rgba(255, 107, 53, 0.15);
+  --glow-red: 0 0 20px rgba(200, 16, 46, 0.5), 0 0 60px rgba(200, 16, 46, 0.2);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ─── Reset & Base ──────────────────────────────────────────────────────────── */
+/* Placed inside @layer base so Tailwind utility classes (p-*, m-*, px-*, etc.)
+   can override these defaults. Unlayered rules beat ALL layered rules in CSS,
+   which was previously killing every spacing utility across the app. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background: #020409;
+    color: #e8edf5;
+    font-family: var(--font-sans, "Inter", sans-serif);
+    overflow-x: hidden;
+  }
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050b18;
+}
+::-webkit-scrollbar-thumb {
+  background: #00a8cc;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00d4ff;
+}
+
+/* ─── Star field background ─────────────────────────────────────────────────── */
+.star-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(0, 212, 255, 0.04) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(200, 16, 46, 0.04) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(232, 184, 75, 0.03) 0%,
+      transparent 50%
+    ),
+    #020409;
+}
+
+/* ─── Glassmorphism panels ──────────────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(15, 25, 35, 0.75);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-panel-red {
+  background: rgba(15, 25, 35, 0.75);
+  border: 1px solid rgba(200, 16, 46, 0.2);
+  backdrop-filter: blur(16px);
+}
+
+/* ─── Glow utilities ────────────────────────────────────────────────────────── */
+.glow-cyan {
+  box-shadow: var(--glow-cyan);
+}
+.glow-orange {
+  box-shadow: var(--glow-orange);
+}
+.glow-red {
+  box-shadow: var(--glow-red);
+}
+.text-glow-cyan {
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.8);
+}
+.text-glow-gold {
+  text-shadow: 0 0 12px rgba(232, 184, 75, 0.8);
+}
+
+/* ─── Scanline overlay (subtle) ─────────────────────────────────────────────── */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── Orbit ring animation ──────────────────────────────────────────────────── */
+@keyframes orbit-spin {
+  from {
+    transform: rotateZ(0deg) rotateX(70deg);
+  }
+  to {
+    transform: rotateZ(360deg) rotateX(70deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ─── Gradient text ─────────────────────────────────────────────────────────── */
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-mission {
+  background: linear-gradient(135deg, #e8b84b 0%, #c8102e 40%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #e8b84b 0%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Shimmer loader ────────────────────────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ─── Terminal / code look ──────────────────────────────────────────────────── */
+.terminal-text {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  color: #00d4ff;
+  font-size: 0.75rem;
+}
+
+/* ─── Button base ───────────────────────────────────────────────────────────── */
+.btn-mission {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.15),
+    rgba(0, 168, 204, 0.1)
+  );
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  color: #00d4ff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-mission:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.3),
+    rgba(0, 168, 204, 0.2)
+  );
+  border-color: rgba(0, 212, 255, 0.8);
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-1px);
+}
+
+.btn-launch {
+  background: linear-gradient(135deg, #c8102e, #8b0000);
+  border: 1px solid rgba(200, 16, 46, 0.6);
+  color: #ffe0e0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-launch:hover {
+  background: linear-gradient(135deg, #e8102e, #c8102e);
+  box-shadow: var(--glow-red);
+  transform: translateY(-1px);
+}
+
+/* ─── Status indicators ─────────────────────────────────────────────────────── */
+.status-online {
+  color: #00ff88;
+}
+.status-warning {
+  color: #ffb347;
+}
+.status-danger {
+  color: #ff4444;
+}
+
+/* ─── Grid lines overlay ────────────────────────────────────────────────────── */
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}

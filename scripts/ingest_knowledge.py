@@ -1,12 +1,12 @@
 """Ingest knowledge base PDFs into ChromaDB vector store."""
 
-from src.rag.vectorstore import build_vectorstore
-from src.rag.chunker import chunk_documents
-from src.config import PATHS
-import sys
-from pathlib import Path
+import sys  # noqa: E402
+from pathlib import Path  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from src.config import PATHS  # noqa: E402
+from src.rag.chunker import chunk_documents  # noqa: E402
+from src.rag.vectorstore import build_vectorstore  # noqa: E402
 
 
 def main():

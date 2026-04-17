@@ -1,15 +1,15 @@
 """Train the hybrid GNN-PINN model."""
 
-from src.config import PATHS
-from src.models.quantization import estimate_flops, quantize_model, compare_model_sizes
-from src.models.gnn import build_gravity_graph
-from src.models.hybrid import HybridGNNPINN
-import numpy as np
-import torch
-import sys
-from pathlib import Path
+import sys  # noqa: E402
+from pathlib import Path  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import numpy as np  # noqa: E402
+import torch  # noqa: E402
+from src.config import PATHS  # noqa: E402
+from src.models.hybrid import HybridGNNPINN  # noqa: E402
+from src.models.gnn import build_gravity_graph  # noqa: E402
+from src.models.quantization import estimate_flops, quantize_model, compare_model_sizes  # noqa: E402
 
 
 def main():

@@ -19,9 +19,9 @@ NASA/AIAA safety standards.
        │                                                         │
        ▼                                                         ▼
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌────────────┐
-│  RAG        │───►│  AGENT       │───►│ EVALUATION   │───►│ DASHBOARD  │
-│  Knowledge  │    │  ReAct Loop  │    │ Red-Team +   │    │ Streamlit  │
-│  Hub        │    │  (Reason+Act)│    │ Guardrails   │    │ 3D Viz     │
+│  RAG        │───▶│  AGENT       │───▶│ EVALUATION   │───▶│ DASHBOARD  │
+│  Knowledge  │    │  ReAct Loop  │    │ Red-Team +   │    │ Next.js +  │
+│  Hub        │    │  (Reason+Act)│    │ Guardrails   │    │ FastAPI    │
 └─────────────┘    └──────────────┘    └──────────────┘    └────────────┘
 ```
 
@@ -68,9 +68,13 @@ NASA/AIAA safety standards.
 
 ### Layer 6 — Dashboard
 
-- 3D Plotly cislunar manifold visualization
+- Next.js 16 + Tailwind CSS v4 + framer-motion frontend
+- FastAPI + Uvicorn backend serving all API endpoints
+- Real-time canvas-based CR3BP orbit visualization with mission history
+- RAG source citations from ChromaDB vector store
 - Multimodal mission-diagram uploader (VLM coordinate extraction)
 - Real-time token-economic analysis (cost per generation)
+- One-click knowledge base re-ingestion with embedding model selection
 - NASA-grade dark theme
 
 ---

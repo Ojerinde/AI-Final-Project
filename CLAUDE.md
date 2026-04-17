@@ -25,7 +25,8 @@ src/llm/             — LLM provider abstraction (Groq, Gemini, OpenAI, …)
 src/rag/             — Chunking, embedding, vector store, reranker
 src/agents/          — ReAct loop, tools, state persistence
 src/evaluation/      — Metrics, red-teaming, guardrails
-dashboard/           — Streamlit UI pages and components
+new setup/client/    — Next.js 16 frontend (App Router, Tailwind v4)
+new setup/server/    — FastAPI backend (all API endpoints)
 knowledge_base/      — PDFs, standards, vector indices
 data/raw/            — Immutable source data
 data/processed/      — Cleaned / audited artefacts

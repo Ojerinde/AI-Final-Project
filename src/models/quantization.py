@@ -48,18 +48,29 @@ def estimate_flops(model: nn.Module, input_size: tuple[int, ...]) -> dict:
     }
 
 
-def quantize_model(model: nn.Module, backend: str = "x86") -> nn.Module:
+def quantize_model(model: nn.Module, backend: str | None = None) -> nn.Module:
     """Quantize a model to INT8 using PyTorch dynamic quantization.
 
     Targets Linear layers for 4× latency reduction with minimal accuracy loss.
 
     Args:
         model: Trained FP32 model.
-        backend: Quantization backend ('x86', 'qnnpack', or 'onednn').
+        backend: Quantization backend. Auto-detected if None.
+                 Options: 'fbgemm' (x86 CPU), 'qnnpack' (ARM), 'onednn'.
 
     Returns:
         Quantized model.
     """
+    if backend is None:
+        # Auto-detect best available backend
+        supported = torch.backends.quantized.supported_engines
+        for preferred in ("fbgemm", "onednn", "qnnpack"):
+            if preferred in supported:
+                backend = preferred
+                break
+        else:
+            backend = supported[0] if supported else "fbgemm"
+
     torch.backends.quantized.engine = backend
     quantized = torch.ao.quantization.quantize_dynamic(
         model,

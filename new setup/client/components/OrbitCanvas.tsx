@@ -78,35 +78,35 @@ export default function OrbitCanvas({
     const bodies: OrbitalBody[] = [
       {
         name: "Moon",
-        radius: 24,
+        radius: 36,
         color: "#C0C8D8",
         glowColor: "rgba(192,200,216,0.5)",
         orbitRadius: Math.min(canvas.width, canvas.height) * 0.4,
         speed: 0.004,
         angle: 0,
-        size: 24,
+        size: 36,
         trail: [],
       },
       {
         name: "Spacecraft",
-        radius: 8,
+        radius: 14,
         color: "#00D4FF",
         glowColor: "rgba(0,212,255,0.8)",
         orbitRadius: Math.min(canvas.width, canvas.height) * 0.24,
         speed: 0.018,
         angle: 1.2,
-        size: 8,
+        size: 14,
         trail: [],
       },
       {
         name: "LEO-SAT",
-        radius: 7,
+        radius: 12,
         color: "#FF6B35",
         glowColor: "rgba(255,107,53,0.7)",
         orbitRadius: Math.min(canvas.width, canvas.height) * 0.15,
         speed: 0.03,
         angle: 2.5,
-        size: 7,
+        size: 12,
         trail: [],
       },
     ];
@@ -204,7 +204,7 @@ export default function OrbitCanvas({
     };
 
     const drawEarth = () => {
-      const r = Math.min(canvas.width, canvas.height) * 0.095;
+      const r = Math.min(canvas.width, canvas.height) * 0.14;
       // Atmosphere glow
       const atm = ctx.createRadialGradient(
         cx(),

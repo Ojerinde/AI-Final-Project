@@ -6,7 +6,7 @@
 
 ---
 
-## PRESENTER 1 — Joshua or Fadlan (~1 min)
+## PRESENTER 1 — Joshua (~40s)
 
 ### Landing Page & Team Introduction
 
@@ -27,11 +27,11 @@
 
 > **[Click CONTINUE → System Maps stage appears]**
 
-"Let me hand it to [other presenter name] to walk you through how this actually works under the hood."
+"Let me hand it over to Fadlan to walk you through how this actually works under the hood."
 
 ---
 
-## PRESENTER 2 — Joshua or Fadlan (~1 min)
+## PRESENTER 2 — Fadlan (~55s)
 
 ### System Architecture & How It Works
 
@@ -50,13 +50,28 @@
 
 "Everything is orchestrated by a **ReAct agent** — it thinks, acts, observes, and repeats until the mission is complete."
 
-"Now let me hand it to Joel to show you the system live."
+"Before we go live, Joshua will add one final technical point that connects this architecture to the results you'll see on the dashboard."
+
+---
+
+## PRESENTER 3 — Joshua (~20s)
+
+### Technical Bridge Before Demo
+
+> **[Screen: Keep System Map visible for a moment before launching]**
+
+**SPEAKER:**
+"One important technical detail is that our system does not treat trajectory generation as just text generation. The LLM handles planning and tool selection, but the final outputs are constrained by physics, checked by guardrails, and grounded with retrieved documents from the vector store."
+
+"So when Joel runs the live demo, the numbers you see for Δv, time of flight, and Jacobi constant are not decorative values — they are part of a constrained pipeline designed to stay physically and operationally meaningful."
+
+"Now Joel will show the system live."
 
 > **[Click LAUNCH → Dashboard appears]**
 
 ---
 
-## PRESENTER 3 — Joel (~2 min)
+## PRESENTER 4 — Joel (~2 min)
 
 ### Live Dashboard Demo
 
@@ -127,12 +142,13 @@
 
 ## TIMING SUMMARY
 
-| Segment   | Presenter     | Duration   | Content                                                      |
-| --------- | ------------- | ---------- | ------------------------------------------------------------ |
-| 1         | Joshua/Fadlan | ~60s       | Landing page, team intro, hook question                      |
-| 2         | Joshua/Fadlan | ~60s       | System architecture, GNN-PINN, RAG, ReAct                    |
-| 3         | Joel          | ~120s      | Live demo: 2 missions, orbit viz, data quality, safety, cost |
-| **Total** |               | **~4 min** |                                                              |
+| Segment   | Presenter | Duration   | Content                                                      |
+| --------- | --------- | ---------- | ------------------------------------------------------------ |
+| 1         | Joshua    | ~40s       | Landing page, team intro, hook question                      |
+| 2         | Fadlan    | ~55s       | System architecture, GNN-PINN, RAG, ReAct                    |
+| 3         | Joshua    | ~20s       | Technical bridge: physics-constrained outputs and grounding  |
+| 4         | Joel      | ~120s      | Live demo: 2 missions, orbit viz, data quality, safety, cost |
+| **Total** |           | **~4 min** |                                                              |
 
 ## TIPS FOR RECORDING
 

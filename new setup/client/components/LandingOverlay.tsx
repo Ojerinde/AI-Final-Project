@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
@@ -11,9 +11,21 @@ type LandingOverlayProps = {
 };
 
 const groupMembers = [
-  { name: "OJERINDE Joel Segun", id: "LS2525253", img: "/Member 1.jpg" },
-  { name: "OGUNLADE Joshua Oluwaseun", id: "LS2525237", img: "/Member 2.jpg" },
-  { name: "ABU-SAFIAN Fadlan", id: "LS2525230", img: "/Member 3.jpg" },
+  {
+    name: "OJERINDE Joel Segun",
+    id: "LS2525253",
+    img: "/Member%201.jpg",
+  },
+  {
+    name: "OGUNLADE Joshua Oluwaseun",
+    id: "LS2525237",
+    img: "/Member%202.jpg",
+  },
+  {
+    name: "ABU-SAFIAN Fadlan",
+    id: "LS2525230",
+    img: "/Member%203.jpg",
+  },
 ];
 
 const systemMaps = [
@@ -34,6 +46,32 @@ const systemMaps = [
 export default function LandingOverlay({ onClose }: LandingOverlayProps) {
   const [stage, setStage] = useState<"members" | "maps">("members");
   const [activeMap, setActiveMap] = useState(0);
+  const [activeShowcasePhoto, setActiveShowcasePhoto] = useState(0);
+
+  const showcasePhotos = [
+    { src: "/Group%201.jpg", alt: "Team group photo 1" },
+    { src: "/Group%202.jpg", alt: "Team group photo 2" },
+    ...groupMembers.map((m) => ({ src: m.img, alt: `${m.name} portrait` })),
+  ];
+
+  // Auto-switch between group photos and member portraits every 4s
+  const groupInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    groupInterval.current = setInterval(() => {
+      setActiveShowcasePhoto((p) => (p + 1) % showcasePhotos.length);
+    }, 4000);
+    return () => {
+      if (groupInterval.current) clearInterval(groupInterval.current);
+    };
+  }, [showcasePhotos.length]);
+
+  // Staggered entrance directions for member cards (left, top, right)
+  const memberEntrance = [
+    { x: -120, y: 40, rotate: -12 }, // Joel — from left
+    { x: 0, y: -120, rotate: 8 }, // Joshua — from top
+    { x: 120, y: 40, rotate: 12 }, // Fadlan — from right
+  ];
 
   const map = useMemo(() => systemMaps[activeMap], [activeMap]);
   const nextMap = () => setActiveMap((m) => (m + 1) % systemMaps.length);
@@ -99,22 +137,34 @@ export default function LandingOverlay({ onClose }: LandingOverlayProps) {
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 >
                   <div className="grid w-full grow grid-cols-1 items-stretch gap-10 lg:grid-cols-[0.85fr_1.4fr] lg:gap-14">
-                    {/* LEFT — Group photo with text overlay */}
+                    {/* LEFT — Showcase: two group photos, then member portraits */}
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                       className="relative overflow-hidden rounded-3xl mt-10"
-                      style={{ minHeight: "700px" }}
+                      style={{ minHeight: "700px", perspective: "1200px" }}
                     >
-                      <Image
-                        src="/Group 1.jpg"
-                        alt="Team group photo"
-                        fill
-                        priority
-                        sizes="(max-width: 1200px) 100vw, 48vw"
-                        className="object-cover"
-                      />
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={activeShowcasePhoto}
+                          className="absolute inset-0"
+                          initial={{ rotateY: 90, opacity: 0 }}
+                          animate={{ rotateY: 0, opacity: 1 }}
+                          exit={{ rotateY: -90, opacity: 0 }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                          style={{ backfaceVisibility: "hidden" }}
+                        >
+                          <Image
+                            src={showcasePhotos[activeShowcasePhoto].src}
+                            alt={showcasePhotos[activeShowcasePhoto].alt}
+                            fill
+                            priority
+                            sizes="(max-width: 1200px) 100vw, 48vw"
+                            className="object-contain"
+                          />
+                        </motion.div>
+                      </AnimatePresence>
                       {/* Strong gradient for text legibility */}
                       <div
                         className="absolute inset-0"
@@ -206,16 +256,29 @@ export default function LandingOverlay({ onClose }: LandingOverlayProps) {
                           <motion.div
                             key={m.id}
                             className="flex flex-col items-center text-center"
-                            initial={{ opacity: 0, y: 22 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{
+                              opacity: 0,
+                              x: memberEntrance[i].x,
+                              y: memberEntrance[i].y,
+                              rotate: memberEntrance[i].rotate,
+                              scale: 0.3,
+                            }}
+                            animate={{
+                              opacity: 1,
+                              x: 0,
+                              y: 0,
+                              rotate: 0,
+                              scale: 1,
+                            }}
                             transition={{
-                              delay: 0.12 + 0.11 * i,
-                              duration: 0.5,
-                              ease: "easeOut",
+                              delay: 0.45 + 0.35 * i,
+                              duration: 1.2,
+                              type: "spring",
+                              stiffness: 115,
+                              damping: 19,
                             }}
                             whileHover={{ y: -6, scale: 1.02 }}
                           >
-                            {/* Circular photo — no card box */}
                             <div
                               className="relative overflow-hidden rounded-full"
                               style={{

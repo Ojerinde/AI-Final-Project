@@ -10,6 +10,7 @@ import {
   Settings2,
 } from "lucide-react";
 import { Badge, TerminalLine } from "./UIKit";
+import { apiUrl } from "@/lib/api";
 
 /* ── Pipeline stage type ─────────────────────────────────────────────────── */
 export type PipelineStage =
@@ -232,15 +233,15 @@ export default function MissionPlanner({
     useState<RerankerModel[]>(FALLBACK_RERANKERS);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/providers")
+    fetch(apiUrl("/api/providers"))
       .then((r) => r.json())
       .then(setProviders)
       .catch(() => {});
-    fetch("http://localhost:8000/api/embedding-models")
+    fetch(apiUrl("/api/embedding-models"))
       .then((r) => r.json())
       .then(setEmbeddings)
       .catch(() => {});
-    fetch("http://localhost:8000/api/reranker-models")
+    fetch(apiUrl("/api/reranker-models"))
       .then((r) => r.json())
       .then(setRerankers)
       .catch(() => {});
@@ -275,7 +276,7 @@ export default function MissionPlanner({
     addLog("▸ Stage 1/3: RAG Context Retrieval...");
 
     try {
-      const res = await fetch("http://localhost:8000/api/agent/run", {
+      const res = await fetch(apiUrl("/api/agent/run"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -598,7 +599,7 @@ export default function MissionPlanner({
     setReingesting(true);
     setReingestResult(null);
     try {
-      const res = await fetch("http://localhost:8000/api/knowledge/reingest", {
+      const res = await fetch(apiUrl("/api/knowledge/reingest"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ embedding_model: embeddingModel }),

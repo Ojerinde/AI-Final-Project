@@ -2,6 +2,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Coins, TrendingUp, Zap, BarChart2, Calculator } from "lucide-react";
 import { MetricCard, Badge } from "./UIKit";
+import { apiUrl } from "@/lib/api";
 import {
   BarChart,
   Bar,
@@ -102,7 +103,7 @@ export default function TokenEconomicsPanel() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/stats/tokens");
+        const res = await fetch(apiUrl("/api/stats/tokens"));
         if (res.ok) {
           const d = await res.json();
           setTotalCalls(d.total_calls);
@@ -117,7 +118,7 @@ export default function TokenEconomicsPanel() {
     };
     const fetchPricing = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/pricing");
+        const res = await fetch(apiUrl("/api/pricing"));
         if (res.ok) {
           const payload = await res.json();
           setPricing(normalizePricing(payload));

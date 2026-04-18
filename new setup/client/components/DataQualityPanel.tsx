@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Database, CheckCircle, AlertTriangle } from "lucide-react";
 import { MetricCard, ProgressRing, Badge } from "./UIKit";
+import { apiUrl } from "@/lib/api";
 
 interface AuditData {
   q_total: number;
@@ -48,7 +49,7 @@ export default function DataQualityPanel() {
   const runAudit = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/audit");
+      const res = await fetch(apiUrl("/api/audit"));
       if (res.ok) setData(await res.json());
     } catch {
       /* use demo */
@@ -58,7 +59,7 @@ export default function DataQualityPanel() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("http://localhost:8000/api/audit", { signal: controller.signal })
+    fetch(apiUrl("/api/audit"), { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then(setData)
       .catch(() => {

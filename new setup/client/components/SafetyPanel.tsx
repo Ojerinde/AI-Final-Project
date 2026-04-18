@@ -10,6 +10,7 @@ import {
   Calculator,
 } from "lucide-react";
 import { Badge, MetricCard } from "./UIKit";
+import { apiUrl } from "@/lib/api";
 
 interface RedTeamResult {
   id: string;
@@ -85,7 +86,7 @@ export default function SafetyPanel() {
   const runTests = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/safety/red-team");
+      const res = await fetch(apiUrl("/api/safety/red-team"));
       if (res.ok) setResults(await res.json());
     } catch {
       setResults(DEMO_RESULTS);
@@ -104,14 +105,11 @@ export default function SafetyPanel() {
     const risk = parseFloat(riskInput);
     const debris = parseFloat(debrisInput);
     try {
-      const res = await fetch(
-        "http://localhost:8000/api/safety/check-casualty-risk",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ risk, debris_lifetime_years: debris }),
-        },
-      );
+      const res = await fetch(apiUrl("/api/safety/check-casualty-risk"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ risk, debris_lifetime_years: debris }),
+      });
       if (res.ok) {
         const data = await res.json();
         // Server returns { approved, violations, risk_submitted, ... }

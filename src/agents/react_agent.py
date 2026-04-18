@@ -32,6 +32,8 @@ class ReActAgent:
         llm_provider: str | None = None,
         llm_model: str | None = None,
         api_key: str | None = None,
+        embedding_model: str | None = None,
+        reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         max_steps: int = 10,
     ):
         """Initialise the agent.
@@ -40,11 +42,15 @@ class ReActAgent:
             llm_provider: LLM provider ID for reasoning.
             llm_model: Model name.
             api_key: Optional API key override.
+            embedding_model: Sentence-transformer model used for vector retrieval.
+            reranker_model: Cross-encoder model used for reranking retrieved chunks.
             max_steps: Maximum ReAct loop iterations.
         """
         self.llm_provider = llm_provider
         self.llm_model = llm_model
         self.api_key = api_key
+        self.embedding_model = embedding_model
+        self.reranker_model = reranker_model
         self.max_steps = max_steps
 
     async def run(self, mission_request: str, resume_id: str | None = None) -> AgentState:
@@ -165,8 +171,27 @@ class ReActAgent:
                 query = action.split("(", 1)[1].rstrip(")")
                 query = query.strip("\"'")
                 from src.rag import query_vectorstore, rerank_results
-                raw = query_vectorstore(query, top_k=10)
-                ranked = rerank_results(query, raw, top_k=5)
+
+                raw = query_vectorstore(
+                    query,
+                    top_k=10,
+                    embedding_model=self.embedding_model,
+                )
+                ranked = rerank_results(
+                    query,
+                    raw,
+                    top_k=5,
+                    model_name=self.reranker_model,
+                )
+                state.context["rag_results"] = ranked
+                state.context["rag_sources"] = [
+                    {
+                        "document": r.get("source", "Unknown"),
+                        "chunk_id": r.get("chunk_id", ""),
+                        "excerpt": r.get("text", "")[:180],
+                    }
+                    for r in ranked
+                ]
                 texts = [r["text"][:200] for r in ranked]
                 return f"Retrieved {len(ranked)} relevant chunks:\n" + "\n---\n".join(texts)
 

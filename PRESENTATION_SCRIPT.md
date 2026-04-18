@@ -128,27 +128,41 @@
 
 "Rejected. The guardrails are constitutional — no LLM can override them."
 
-### Closing (~15s)
+### Closing (~35s)
 
 > **[Switch to Token Economics tab briefly]**
 
 "Finally — cost. We use free-tier LLMs — Groq and Gemini — so the entire system runs at **zero cost**. No paid API keys needed."
 
-> **[Look at camera]**
+> **[Look at camera — slow down, speak personally]**
 
-"In summary: type a mission in plain English, get a physics-compliant trajectory in seconds, grounded in real NASA documents, with safety checks that can't be bypassed. Thank you."
+"Before we go — I want to say something honest. When we started this project, none of us fully knew what we were building. We had a idea, a dataset, and a deadline. But along the way, we learned more than any lecture could have taught us — about physics, about AI, about what it means to build something real."
+
+"And what we walked away believing is this: **there really is no limit to what AI can do** — especially when you pair it with real science and real constraints. We've only scratched the surface here."
+
+"We'll keep improving this system. And if you're curious, want to collaborate, or just want to talk about cislunar trajectories at 2am — you're welcome to reach out to **Joshua, Joel, or Fadlan**."
+
+> **[Pause. Smile. Let the quote land.]**
+
+"We'll leave you with a quote from Konstantin Tsiolkovsky — the father of astronautics — who said:"
+
+> **[Read slowly, clearly]**
+
+_"The Earth is the cradle of humanity — but mankind cannot stay in the cradle forever."_
+
+"We built a tool to help us take the next step. Thank you."
 
 ---
 
 ## TIMING SUMMARY
 
-| Segment   | Presenter | Duration   | Content                                                      |
-| --------- | --------- | ---------- | ------------------------------------------------------------ |
-| 1         | Joshua    | ~40s       | Landing page, team intro, hook question                      |
-| 2         | Fadlan    | ~55s       | System architecture, GNN-PINN, RAG, ReAct                    |
-| 3         | Joshua    | ~20s       | Technical bridge: physics-constrained outputs and grounding  |
-| 4         | Joel      | ~120s      | Live demo: 2 missions, orbit viz, data quality, safety, cost |
-| **Total** |           | **~4 min** |                                                              |
+| Segment   | Presenter | Duration     | Content                                                               |
+| --------- | --------- | ------------ | --------------------------------------------------------------------- |
+| 1         | Joshua    | ~40s         | Landing page, team intro, hook question                               |
+| 2         | Fadlan    | ~55s         | System architecture, GNN-PINN, RAG, ReAct                             |
+| 3         | Joshua    | ~20s         | Technical bridge: physics-constrained outputs and grounding           |
+| 4         | Joel      | ~150s        | Live demo: 2 missions, orbit viz, data quality, safety, cost, closing |
+| **Total** |           | **~4.5 min** |                                                                       |
 
 ## TIPS FOR RECORDING
 

@@ -340,16 +340,18 @@ async def api_agent_run(payload: AgentRequest) -> dict[str, Any]:
     traj = _estimate_trajectory(payload.mission)
 
     try:
-        agent_kwargs: dict[str, Any] = {"llm_provider": payload.provider}
+        agent_kwargs: dict[str, Any] = {
+            "llm_provider": payload.provider,
+            "embedding_model": payload.embedding_model,
+            "reranker_model": payload.reranker_model,
+        }
         if payload.model:
             agent_kwargs["llm_model"] = payload.model
         if payload.api_key:
             agent_kwargs["api_key"] = payload.api_key
-        if payload.resume_id:
-            agent_kwargs["session_id"] = payload.resume_id
 
         agent = ReActAgent(**agent_kwargs)
-        result = await agent.run(payload.mission)
+        result = await agent.run(payload.mission, resume_id=payload.resume_id)
 
         steps = []
         sources: list[dict[str, str]] = []

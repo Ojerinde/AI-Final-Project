@@ -6,6 +6,7 @@ using sentence-transformers.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 import chromadb
@@ -14,6 +15,7 @@ from chromadb.config import Settings
 from src.config import PATHS, EMBEDDING_MODEL, RAG_TOP_K
 
 
+@lru_cache(maxsize=8)
 def _get_embedding_function(model_name: str | None = None):
     """Get the sentence-transformers embedding function for ChromaDB.
 
@@ -55,10 +57,11 @@ def build_vectorstore(
     except Exception:
         pass
 
+    chosen_model = embedding_model or EMBEDDING_MODEL
     collection = client.create_collection(
         name=collection_name,
-        embedding_function=_get_embedding_function(embedding_model),
-        metadata={"hnsw:space": "cosine"},
+        embedding_function=_get_embedding_function(chosen_model),
+        metadata={"hnsw:space": "cosine", "embedding_model": chosen_model},
     )
 
     # Add chunks in batches of 100
@@ -96,18 +99,40 @@ def query_vectorstore(
         path=persist_dir,
         settings=Settings(anonymized_telemetry=False),
     )
-    collection = client.get_collection(
-        name=collection_name,
-        embedding_function=_get_embedding_function(embedding_model),
-    )
+    model_to_use = embedding_model or EMBEDDING_MODEL
 
-    where_filter = {"source": source_filter} if source_filter else None
+    def _run_query(model_name: str):
+        collection = client.get_collection(
+            name=collection_name,
+            embedding_function=_get_embedding_function(model_name),
+        )
+        where_filter = {"source": source_filter} if source_filter else None
+        return collection.query(
+            query_texts=[query],
+            n_results=top_k,
+            where=where_filter,
+        )
 
-    results = collection.query(
-        query_texts=[query],
-        n_results=top_k,
-        where=where_filter,
-    )
+    try:
+        results = _run_query(model_to_use)
+    except Exception as exc:
+        # Handle embedding dimension mismatch by retrying with the expected model.
+        msg = str(exc)
+        dim_to_model = {
+            "1024": "all-roberta-large-v1",
+            "768": "all-mpnet-base-v2",
+            "384": "all-MiniLM-L6-v2",
+        }
+        retry_model = None
+        for dim, model_name in dim_to_model.items():
+            if f"dimension of {dim}" in msg:
+                retry_model = model_name
+                break
+
+        if retry_model is None or retry_model == model_to_use:
+            raise
+
+        results = _run_query(retry_model)
 
     output = []
     for i in range(len(results["ids"][0])):

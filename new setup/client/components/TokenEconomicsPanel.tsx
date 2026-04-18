@@ -24,25 +24,20 @@ const PROVIDERS_DATA = [
   { name: "Ollama Local", cost: 0, tokens_m: 0, latency: 900, free: true },
 ];
 
-const TOKEN_HISTORY = Array.from({ length: 12 }, (_, i) => ({
-  month: [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ][i],
-  groq: Math.round(Math.random() * 80 + 20),
-  gemini: Math.round(Math.random() * 60 + 10),
-  total: Math.round(Math.random() * 140 + 30),
-}));
+const TOKEN_HISTORY = [
+  { month: "Jan", groq: 28, gemini: 14, total: 42 },
+  { month: "Feb", groq: 31, gemini: 16, total: 47 },
+  { month: "Mar", groq: 36, gemini: 19, total: 55 },
+  { month: "Apr", groq: 34, gemini: 21, total: 55 },
+  { month: "May", groq: 41, gemini: 24, total: 65 },
+  { month: "Jun", groq: 45, gemini: 27, total: 72 },
+  { month: "Jul", groq: 48, gemini: 29, total: 77 },
+  { month: "Aug", groq: 52, gemini: 31, total: 83 },
+  { month: "Sep", groq: 56, gemini: 33, total: 89 },
+  { month: "Oct", groq: 61, gemini: 36, total: 97 },
+  { month: "Nov", groq: 64, gemini: 39, total: 103 },
+  { month: "Dec", groq: 68, gemini: 42, total: 110 },
+];
 
 const TOOLTIP_STYLE = {
   backgroundColor: "#0D1B2A",
@@ -61,6 +56,48 @@ export default function TokenEconomicsPanel() {
   const [pricing, setPricing] = useState<
     Record<string, { name: string; cost_per_1m: number; free: boolean }>
   >({});
+
+  const normalizePricing = (
+    payload: unknown,
+  ): Record<string, { name: string; cost_per_1m: number; free: boolean }> => {
+    if (Array.isArray(payload)) {
+      const out: Record<
+        string,
+        { name: string; cost_per_1m: number; free: boolean }
+      > = {};
+      payload.forEach((p, idx) => {
+        if (typeof p !== "object" || p === null) return;
+        const row = p as {
+          provider?: string;
+          input_per_m?: number;
+          output_per_m?: number;
+          free?: boolean;
+        };
+        const key = (row.provider || `provider_${idx}`)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_");
+        const input = Number(row.input_per_m ?? 0);
+        const output = Number(row.output_per_m ?? 0);
+        out[key] = {
+          name: row.provider || `Provider ${idx + 1}`,
+          // Average blended rate for quick estimator card
+          cost_per_1m: Number.isFinite((input + output) / 2)
+            ? (input + output) / 2
+            : 0,
+          free: Boolean(row.free),
+        };
+      });
+      return out;
+    }
+
+    if (payload && typeof payload === "object") {
+      return payload as Record<
+        string,
+        { name: string; cost_per_1m: number; free: boolean }
+      >;
+    }
+    return {};
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -81,7 +118,10 @@ export default function TokenEconomicsPanel() {
     const fetchPricing = async () => {
       try {
         const res = await fetch("http://localhost:8000/api/pricing");
-        if (res.ok) setPricing(await res.json());
+        if (res.ok) {
+          const payload = await res.json();
+          setPricing(normalizePricing(payload));
+        }
       } catch {
         setPricing({
           groq: { name: "Groq", cost_per_1m: 0, free: true },

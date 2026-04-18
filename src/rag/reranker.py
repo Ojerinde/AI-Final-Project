@@ -6,7 +6,17 @@ using a cross-encoder model for more accurate relevance ranking.
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 from src.config import RAG_RERANK_K
+
+
+@lru_cache(maxsize=4)
+def _get_reranker(model_name: str):
+    """Get or cache a CrossEncoder model instance by name."""
+    from sentence_transformers import CrossEncoder
+
+    return CrossEncoder(model_name)
 
 
 def rerank_results(
@@ -29,9 +39,7 @@ def rerank_results(
     if not results:
         return []
 
-    from sentence_transformers import CrossEncoder
-
-    model = CrossEncoder(model_name)
+    model = _get_reranker(model_name)
     pairs = [(query, r["text"]) for r in results]
     scores = model.predict(pairs)
 

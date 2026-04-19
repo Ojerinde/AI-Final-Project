@@ -1,7 +1,11 @@
 # AI-Based Fast Cislunar Trajectory Generation
 
+<img width="3407" height="1841" alt="image" src="https://github.com/user-attachments/assets/e727ec0a-b153-4ec8-b401-cdbaab56cedf" />
+
 > **Three-Body Problem (Solvers)** — Beihang University AI Practice Final Project
 >
+> <img width="3524" height="1725" alt="image" src="https://github.com/user-attachments/assets/7d3b3162-62ba-4408-8845-bdbff855180c" />
+
 > **Team:** OJERINDE Joel Segun (LS2525253) · OGUNLADE Joshua Oluwaseun (LS2525237) · ABU-SAFIAN Fadlan (LS2525230)
 
 End-to-end AI system for generating physics-compliant transfer trajectories from **LEO (Low Earth Orbit, 167 km)** to **LMO (Low Moon Orbit, 100 km)** using a hybrid GNN-PINN deep-learning architecture, grounded in NASA/AIAA safety standards via RAG (Retrieval-Augmented Generation), and orchestrated by a ReAct agent.

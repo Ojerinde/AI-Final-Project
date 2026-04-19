@@ -1,8 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
-import { ArrowRight, Rocket, ShieldCheck, Orbit, Database } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import {
+  ArrowRight,
+  Rocket,
+  ShieldCheck,
+  Orbit,
+  Database,
+  Play,
+  X,
+} from "lucide-react";
 import StarField from "@/components/StarField";
 
 const fadeUp: Variants = {
@@ -19,6 +28,7 @@ const fadeUp: Variants = {
 };
 
 export default function Home() {
+  const [videoOpen, setVideoOpen] = useState(false);
   return (
     <div className="relative min-h-screen overflow-hidden bg-space-void">
       <StarField />
@@ -100,7 +110,50 @@ export default function Home() {
               >
                 Launch Control Room
               </Link>
+              <button
+                onClick={() => setVideoOpen(true)}
+                className="flex items-center gap-2 rounded-xl border border-[rgba(0,212,255,0.3)] bg-[rgba(0,212,255,0.06)] px-5 py-3 text-xs uppercase tracking-[0.2em] text-[#00D4FF] hover:bg-[rgba(0,212,255,0.14)] hover:border-[rgba(0,212,255,0.6)] transition-all duration-200"
+              >
+                <Play size={13} className="fill-[#00D4FF]" /> Watch Demo
+              </button>
             </motion.div>
+
+            {/* Full-screen video modal */}
+            <AnimatePresence>
+              {videoOpen && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+                  onClick={() => setVideoOpen(false)}
+                >
+                  <motion.div
+                    initial={{ scale: 0.92, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.92, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="relative w-full max-w-6xl mx-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setVideoOpen(false)}
+                      className="absolute -top-10 right-0 flex items-center gap-1.5 text-xs text-[#C0C8D8] hover:text-white transition-colors"
+                    >
+                      <X size={16} /> Close
+                    </button>
+                    <video
+                      src="/Recording.mp4"
+                      controls
+                      autoPlay
+                      className="w-full rounded-2xl border border-[rgba(0,212,255,0.2)] shadow-[0_0_60px_rgba(0,212,255,0.15)]"
+                      style={{ maxHeight: "85vh" }}
+                    />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <motion.div
               custom={4}

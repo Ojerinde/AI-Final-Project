@@ -26,3 +26,7 @@ data/raw/*
 
 # ── Jupyter ────────────────────────
 .ipynb_checkpoints/
+
+# ── Presentation & internal docs ───
+# PRESENTATION_SCRIPT.md
+# PROJECT_DEEP_DIVE.md

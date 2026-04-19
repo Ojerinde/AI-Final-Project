@@ -50,6 +50,8 @@ export default function LandingOverlay({ onClose }: LandingOverlayProps) {
   const showcasePhotos = [
     { src: "/Group%201.jpg", alt: "Team group photo 1" },
     { src: "/Group%202.jpg", alt: "Team group photo 2" },
+    { src: "/Group%203.jpg", alt: "Team group photo 3" },
+    { src: "/Group%204.jpg", alt: "Team group photo 4" },
     ...groupMembers.map((m) => ({ src: m.img, alt: `${m.name} portrait` })),
   ];
 

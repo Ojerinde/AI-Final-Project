@@ -1,5 +1,7 @@
 # AI-Based Fast Cislunar Trajectory Generation
 
+<img height="700" alt="image" src="https://github.com/user-attachments/assets/e727ec0a-b153-4ec8-b401-cdbaab56cedf" />
+
 > **Three-Body Problem (Solvers)** — Beihang University AI Practice Final Project
 >
 > **Team:** OJERINDE Joel Segun (LS2525253) · OGUNLADE Joshua Oluwaseun (LS2525237) · ABU-SAFIAN Fadlan (LS2525230)

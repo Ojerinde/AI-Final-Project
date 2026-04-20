@@ -834,5 +834,145 @@ A: The `except` block in `MissionPlanner.tsx` catches any server error and runs 
 
 ---
 
+## 21. THE CR3BP PHYSICS VISUALISER TAB
+
+This is the newest addition to the dashboard — a dedicated **"CR3BP Physics"** tab (purple atom icon in the sidebar) containing two live animated visualisations that run entirely in the browser with no external libraries.
+
+---
+
+### Visualisation 1 — Zero-Velocity Curves
+
+**File:** `new setup/client/components/ZeroVelocityCanvas.tsx`
+
+#### Plain English
+
+Imagine you throw a ball inside a spinning room. Depending on how hard you threw it (its energy), there are regions of the room the ball can never physically reach — because getting there would require negative kinetic energy, which is impossible. Those unreachable regions are the **forbidden zones**. The boundary between "can reach" and "cannot reach" is called the **zero-velocity curve** — because at that boundary, all the energy has been converted to potential energy and the spacecraft's speed is exactly zero.
+
+In our animation, you watch the forbidden zone (dark purple) shrink in real time as the Jacobi constant C decreases (spacecraft gains energy). As it shrinks, **gates open** at the Lagrange points — first L1, then L2, then L3, then L4/L5.
+
+#### Technical
+
+The animation computes the **CR3BP effective potential** for every pixel:
+
+```
+Ω(x, y) = ½(x² + y²) + (1-μ)/r₁ + μ/r₂
+```
+
+Where:
+
+- `½(x² + y²)` = centrifugal potential from the rotating frame
+- `(1-μ)/r₁` = gravitational potential from Earth
+- `μ/r₂` = gravitational potential from Moon
+- `r₁`, `r₂` = distances from the point (x,y) to Earth and Moon respectively
+
+A point is in the **forbidden zone** when `2·Ω(x,y) < C` — meaning the spacecraft's kinetic energy would be negative there (impossible). The boundary `2·Ω = C` is the zero-velocity curve.
+
+**What the colours mean:**
+| Colour | Meaning |
+|--------|---------|
+| Deep purple/violet | Forbidden zone — spacecraft cannot enter |
+| Glowing cyan | Near the zero-velocity boundary — accessible but barely |
+| Dark transparent | Far-field, freely accessible |
+| Bright white dot | Singularity at Earth or Moon core (clamped) |
+
+**The animation:** C oscillates slowly between 2.85 and 3.27 on a ~22-second cycle. At C = 3.27 (high energy barrier), all gates are closed. As C drops toward 2.85, gates open sequentially:
+
+1. **C < C(L1) ≈ 3.188** → L1 gate opens → spacecraft can cross to lunar region
+2. **C < C(L2) ≈ 3.172** → L2 gate opens → escape from Earth-Moon system possible
+3. **C < C(L3) ≈ 3.012** → L3 gate opens → far-side connection
+4. **C < C(L4/5) ≈ 2.988** → all zones merge → no forbidden region remains
+
+**Why it matters for the project:** Every trajectory we generate has a Jacobi constant. If C > C(L1), the spacecraft is trapped near Earth and cannot reach the Moon without a Δv burn. Our GNN-PINN model is constrained so the generated Jacobi constant is always physically consistent with the transfer type selected.
+
+**How it's drawn:** A low-resolution offscreen canvas (¼ resolution) is computed per-frame using the Ω formula, then smoothly upscaled to full resolution. This keeps it at 60fps without a GPU.
+
+---
+
+### Visualisation 2 — 3D Gravity Well Surface
+
+**File:** `new setup/client/components/GravityWellCanvas.tsx`
+
+#### Plain English
+
+Have you seen those videos of a marble rolling around a curved funnel, spiraling toward a hole in the middle? This is the same idea, but for gravity in the Earth-Moon system. We take the same effective potential Ω(x,y) from above and render it as a 3D landscape:
+
+- **Where the landscape dips down** = strong gravity (Earth and Moon)
+- **Where the landscape is flat** = weak gravity (far field)
+- **The 5 saddle points** = Lagrange points (like mountain passes between two gravity valleys)
+- **L1 and L2** = saddle points (unstable — like a ball balanced on top of a hill; nudge it and it rolls off)
+- **L4 and L5** = stable hilltops at equal distance from Earth and Moon (like a bowl turned upside down — but the Coriolis force from the rotating frame actually makes these stable!)
+
+The surface slowly rotates so you can see the full 3D topology of the gravitational landscape.
+
+#### Technical
+
+**Rendering method:** Software rasterisation using the **Painter's Algorithm** — a classic computer graphics technique where you:
+
+1. Compute all 42×42 = 1,764 surface quads
+2. Sort them back-to-front by depth (furthest first)
+3. Draw each quad on top of the previous ones
+
+No WebGL, no Three.js — pure HTML5 Canvas 2D.
+
+**Projection:** The 3D world coordinates (wx, wy, wz) are projected to screen using:
+
+```
+1. Rotate around z-axis: wx,wy → rx,ry  (slow spin: φ = t × 0.0035 radians/frame)
+2. Tilt around x-axis by 28°:  apply thetaX
+3. Perspective divide: d = fov / (fov + tz + 4)  →  screen (sx, sy)
+```
+
+**Height formula:**
+
+```
+wz = -(Ω(x,y) - 1.48) / 2.5 × 0.9
+```
+
+We subtract a baseline Ω ≈ 1.48 (the flat far-field value) so the far field sits at z = 0. The negative sign makes wells dip downward. The division by 2.5 and multiplication by 0.9 controls the vertical exaggeration.
+
+**Lighting:** Each quad's surface normal is estimated from finite differences of its corner heights. A dot product with a light direction vector gives a diffuse brightness:
+
+```
+brightness = 0.45 + 0.55 × dot(surface_normal, light_direction)
+```
+
+This creates highlights on slopes facing the light and shadows on the other side, giving the surface realistic depth.
+
+**Colour scale (depth → colour):**
+| Depth | Colour | Meaning |
+|-------|--------|---------|
+| 0–25% | Dark navy | Far field, low potential |
+| 25–55% | Blue-teal | Moderate potential gradient |
+| 55–80% | Cyan | Deep gradient, approaching a body |
+| 80–100% | White-cyan | Near singularity (Earth/Moon core) |
+
+**Lagrange point spires:** Each L point is drawn as a vertical spike at its (wx, wy) position, rising from the surface to a glowing tip. The spike height pulses gently using a sine wave. The gold colour matches the HUD display.
+
+**The saddle shape at L1/L2/L3:** If you watch the rotating surface carefully, you'll see L1 sits between the two gravity pits — like a mountain pass. The surface dips toward both Earth and Moon from that point, but rises along the perpendicular axis. This is what makes L1 a Lagrange point: the gravitational and centrifugal forces balance exactly there, but any displacement gets amplified (unstable).
+
+**Why these visuals matter for the presentation:**
+
+- They make the abstract physics tangible — professors can see why reaching the Moon requires crossing the L1 saddle
+- The Jacobi animation directly shows why our system reports a specific C value for each transfer type
+- The gravity well surface explains why low-energy WSB transfers work — the spacecraft rides along the "shoulders" of the gravity landscape using the Sun's perturbation to gradually lower C
+
+---
+
+### Common Questions About These Visualisations
+
+**Q: Why does the Jacobi constant oscillate in the zero-velocity animation? Is that physically meaningful?**  
+A: No — the oscillation is purely for animation. In a real mission, C is fixed by the spacecraft's energy state. We animate it to show the audience all the different regimes in one smooth demonstration instead of having separate static images.
+
+**Q: Why is L4/L5 stable when it's at the "top" of a hill?**  
+A: In the non-rotating inertial frame, L4 and L5 are unstable. But in the rotating frame, the Coriolis force (the same force that makes water spiral down a drain) creates a stabilising effect. Spacecraft and asteroids at L4/L5 undergo small loops (tadpole orbits) but don't drift away. Jupiter's Trojan asteroids sit at Jupiter's L4 and L5.
+
+**Q: What is the "effective potential" Ω really?**  
+A: It combines three things: (1) Earth's gravity, (2) Moon's gravity, (3) the centrifugal effect from being in a rotating reference frame. If you're standing in the rotating frame (which spins once per lunar month), you feel a fake outward force — the centrifugal force. Adding all three gives Ω, and the Jacobi constant C = 2Ω - v² is conserved. Think of it like "total energy in the rotating frame."
+
+**Q: Could we have used Three.js or WebGL instead?**  
+A: Yes, and it would have been much prettier with shadows, textures, and real-time reflections. We chose pure Canvas 2D deliberately to demonstrate that the visualisation logic comes from our own implementation of the CR3BP physics — not a 3D engine doing the work for us. Every pixel colour in the zero-velocity plot comes from evaluating the actual CR3BP potential formula.
+
+---
+
 _Document prepared for Beihang University AI Final Project, April 2026._  
 _For questions: reach out to Joshua, Joel, or Fadlan._

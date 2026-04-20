@@ -12,12 +12,15 @@ import {
   Cpu,
   Radar,
   CheckCircle,
+  Atom,
 } from "lucide-react";
 import MissionPlanner, { type PipelineStage } from "./MissionPlanner";
 import DataQualityPanel from "./DataQualityPanel";
 import SafetyPanel from "./SafetyPanel";
 import TokenEconomicsPanel from "./TokenEconomicsPanel";
 import OrbitCanvas, { type MissionSnapshot } from "./OrbitCanvas";
+import ZeroVelocityCanvas from "./ZeroVelocityCanvas";
+import GravityWellCanvas from "./GravityWellCanvas";
 import { Badge } from "./UIKit";
 
 const MISSION_PALETTE = [
@@ -36,6 +39,7 @@ const MISSION_PALETTE = [
 const TABS = [
   { id: "mission", label: "Mission Planner", icon: Rocket, color: "#C8102E" },
   { id: "orbit", label: "3D Orbit View", icon: Satellite, color: "#00D4FF" },
+  { id: "physics", label: "CR3BP Physics", icon: Atom, color: "#A855F7" },
   { id: "data", label: "Data Audit", icon: Database, color: "#E8B84B" },
   { id: "safety", label: "Safety & Red-Team", icon: Shield, color: "#00FF88" },
   { id: "token", label: "Token Economics", icon: Coins, color: "#FF6B35" },
@@ -419,7 +423,7 @@ export default function Dashboard() {
                               className={`w-5 h-1 rounded-full shrink-0 ${i === missionHistory.length - 1 ? "" : "opacity-40"}`}
                               style={{ background: m.color }}
                             />
-                            <span className="truncate max-w-[160px]">
+                            <span className="truncate max-w-40">
                               #{m.id} Δv {m.delta_v.toFixed(2)} ·{" "}
                               {m.tof_days.toFixed(1)}d
                             </span>
@@ -434,6 +438,103 @@ export default function Dashboard() {
             {activeTab === "data" && <DataQualityPanel />}
             {activeTab === "safety" && <SafetyPanel />}
             {activeTab === "token" && <TokenEconomicsPanel />}
+
+            {/* ── CR3BP Physics Visualisations ───────────────────────── */}
+            {activeTab === "physics" && (
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                  <Atom size={24} className="text-[#A855F7]" />
+                  <h2 className="text-2xl font-bold text-[#A855F7]">
+                    CR3BP Physics Visualiser
+                  </h2>
+                  <span className="ml-auto text-xs font-mono text-[#888]">
+                    μ = 0.01215 · Earth-Moon rotating frame · real-time
+                  </span>
+                </div>
+
+                {/* Jacobi / Zero-Velocity Curves */}
+                <div className="glass-panel rounded-3xl border border-[rgba(168,85,247,0.2)] overflow-hidden">
+                  <div className="px-6 py-4 border-b border-[rgba(168,85,247,0.12)] flex flex-wrap items-center gap-3">
+                    <span className="text-sm font-bold text-[#A855F7] font-mono tracking-widest uppercase">
+                      Zero-Velocity Curves — Jacobi Forbidden Zones
+                    </span>
+                    <span className="text-xs text-[#8F9AAC] font-mono">
+                      Animated · C oscillates between C(L4/5) and C(L1)+margin
+                    </span>
+                  </div>
+                  <div style={{ height: "52vh" }}>
+                    <ZeroVelocityCanvas />
+                  </div>
+                  <div className="px-6 py-4 border-t border-[rgba(168,85,247,0.1)] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono text-[#8F9AAC]">
+                    <div>
+                      <span className="text-[#A855F7] font-bold">
+                        Purple region
+                      </span>{" "}
+                      — spacecraft with the current Jacobi constant C cannot
+                      physically reach this zone (kinetic energy would go
+                      negative).
+                    </div>
+                    <div>
+                      <span className="text-[#00D4FF] font-bold">
+                        Glowing cyan boundary
+                      </span>{" "}
+                      — the zero-velocity curve. As C decreases (more energy),
+                      the gates at L1 and L2 open and the spacecraft gains
+                      access to the Moon or escape.
+                    </div>
+                    <div>
+                      <span className="text-[#00FF88] font-bold">
+                        Green dots
+                      </span>{" "}
+                      = open Lagrange point gates.{" "}
+                      <span className="text-[#FF6B35] font-bold">Orange</span> =
+                      still closed. Watch L1 open first, then L2, then L3, then
+                      L4/L5.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3D Gravity Well */}
+                <div className="glass-panel rounded-3xl border border-[rgba(255,107,53,0.2)] overflow-hidden">
+                  <div className="px-6 py-4 border-b border-[rgba(255,107,53,0.12)] flex flex-wrap items-center gap-3">
+                    <span className="text-sm font-bold text-[#FF6B35] font-mono tracking-widest uppercase">
+                      3-D Effective Potential Ω(x,y) — Gravity Well Surface
+                    </span>
+                    <span className="text-xs text-[#8F9AAC] font-mono">
+                      Slowly rotating · Painter&apos;s algorithm · 42×42 mesh
+                    </span>
+                  </div>
+                  <div style={{ height: "56vh" }}>
+                    <GravityWellCanvas />
+                  </div>
+                  <div className="px-6 py-4 border-t border-[rgba(255,107,53,0.1)] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono text-[#8F9AAC]">
+                    <div>
+                      <span className="text-[#FF6B35] font-bold">
+                        Deep blue-cyan pits
+                      </span>{" "}
+                      — Earth and Moon gravity wells. The spacecraft falls in as
+                      it approaches; escaping requires the insertion burn (Δv).
+                    </div>
+                    <div>
+                      <span className="text-[#E8B84B] font-bold">
+                        Gold spires
+                      </span>{" "}
+                      — the 5 Lagrange points. L1, L2, L3 sit at unstable saddle
+                      points between the wells. L4, L5 sit at stable local
+                      maxima (equilateral triangle).
+                    </div>
+                    <div>
+                      <span className="text-[#00D4FF] font-bold">
+                        Bright cyan ridge
+                      </span>{" "}
+                      — peak depth at Earth/Moon cores (clamped singularities).
+                      The flat cyan plateau is the far-field low-energy region.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
